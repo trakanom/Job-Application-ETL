@@ -271,7 +271,30 @@ class HTML_Scraper:
 
     def update_db(self):
         pass
+    
+    def clean_db(self,debug=False):
+        host_dir="data\\output_files\\"
+        working_dir=['scraped_data\\','']
+        #Delete files
+        for directory in working_dir:
+            folder_path = host_dir+directory
+            if os.path.exists(host_dir+directory):
+                folder_path = host_dir+directory
+                file_list=set(os.listdir(folder_path))
                 if debug|self.debug:
+                    print("We're in.,{}\n=,{}".format(file_path,file_list))
+                for file in file_list:
+                    file_path = folder_path+file
+                    print(file_path)
+                    if os.path.exists(file_path):
+                        if debug|self.debug:
+                            print("FILE FOUND!",file_path)
+                        try:
+                            os.remove(file_path)
+                        except:
+                            os.rmdir(file_path)
+        #create deleted dir
+        os.mkdir("data\\output_files\\scraped_data")
 
 class jobID:
     def __init__(self):
@@ -291,11 +314,17 @@ class jobID:
 if __name__=='__main__':
     try:
         debug = True if 'debug' in sys.argv else False
+        clean = True if 'clean' in sys.argv else False
     except:
         debug = False
+        clean = False
     h = HTML_Scraper('data\\', debug=debug)
-    
-    h.download_posting_html()
+    if clean==True:
+        h.clean_db()
+    else:
+        h.update_from_local()
+        h.export_to_file()
+        h.download_posting_html()
     # h.import_from_file()
     
     # # Debugging:
