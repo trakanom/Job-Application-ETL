@@ -1,3 +1,4 @@
+import sys
 import os
 import re
 import csv
@@ -5,16 +6,17 @@ import urllib.request
 
 
 class HTML_Scraper:
-    def __init__(self, working_directory):
+    def __init__(self, working_directory, debug=False):
         self.working_dir = working_directory
         self.read_filenames = set()
         self.scraped_htmls = set()
         self.JobID=jobID()
         self.applied_jobs = []
         self.posted_jobs = []
+        self.debug=debug
 
     def scan_new_application(self, file_name, file_contents, debug=False):
-        if debug:
+        if debug|self.debug:
             print("~~DEBUG~~:")
 
         #Get Date
@@ -26,12 +28,12 @@ class HTML_Scraper:
         prefix = "You applied for "
         m = re.compile(f"{prefix}.+\.eml",flags=re.DOTALL)
         if re.match(m, file_name):
-            if debug:
+            if debug|self.debug:
                 print(f"easy way worked!")
             Subject = file_name[:-4]
             Position, Company = Subject[len(prefix):].split(" at ")
         else:
-            if debug:
+            if debug|self.debug:
                 print(f"easy way failed:::{file_name}")
             try:
                 p=re.compile(r"Subject: You applied for (.+)MIME", flags=re.DOTALL)
@@ -42,7 +44,7 @@ class HTML_Scraper:
             except:
                 p=re.compile(r"Subject: (.+)MIME", flags=re.DOTALL)
                 match = re.search(p,file_contents)
-                if debug:
+                if debug|self.debug:
                     print("It broke. ",file_name)
                 Subject = match.group().replace('\n','').replace('_'," ").strip('MIME')
                 Position, Company = Subject[25:].split(" at ")
@@ -55,7 +57,7 @@ class HTML_Scraper:
         stored2 = match3.group().strip('&jobId=')[2:]
         JobURL = f'https://www.linkedin.com/jobs/view/{stored2}/'
         
-        if debug:
+        if debug|self.debug:
             if m:
                 print(f"SUBJECT: {Subject}")
             if match2:
@@ -73,7 +75,7 @@ class HTML_Scraper:
             'date_viewed':None,
             'date_rejected':None,
         }
-        if debug:
+        if debug|self.debug:
             print("DATA: ",data)
         return data
 
@@ -85,7 +87,7 @@ class HTML_Scraper:
         prefix = "Your application for "
         m = re.compile(f"{prefix}.+\.eml",flags=re.DOTALL)
         if re.match(m, file_name):
-            if debug:
+            if debug|self.debug:
                 print(f"easy way worked!")
             Position, Company = Subject[len(prefix):].split(" was viewed by ")
         data = {
@@ -108,6 +110,8 @@ class HTML_Scraper:
             if debug:
                 print(f"easy way worked!")
             Position, Company = Subject[len(prefix):].split(" at ")
+            if debug|self.debug:
+                print("easy way worked! {} at {}".format(Position,Company))
         data = {
             'file_name':file_name,
             'subject':Subject,
@@ -118,35 +122,35 @@ class HTML_Scraper:
         return data
 
     def add_new_entries(self, payload, type, debug=False):
-        if debug:
+        if debug|self.debug:
             print(payload)
         if type=="applied":
             self.applied_jobs.append(payload)
         else:
-            if debug:
+            if debug|self.debug:
                 print(self.applied_jobs)
             for index, application in enumerate(self.applied_jobs):
-                if debug:
-                    print("APP: ",application)
+                if debug|self.debug:
+                    print("APP:",application)
                     print("app",application['company'],".")
                     print("pay",payload['company'],".")
                     print("app",application['position'],".")
                     print("pay",payload['position'],".")
                 if application['company']==payload['company']:
-                    if debug:
+                    if debug|self.debug:
                         print("Checks out")
                     if application['position']==payload['position']:
                         if type=="rejected":
                             self.applied_jobs[index]['date_rejected']=payload['date_rejected']
                         if type=="viewed":
                             self.applied_jobs[index]['date_viewed']=payload['date_viewed']
-                        if debug:
+                        if debug|self.debug:
                             print("Checks out")
                             print(self.applied_jobs[index])
                         break
                 else:
                     pass
-                    if debug:
+                    if debug|self.debug:
                         print("match error")
 
         self.read_filenames.add(payload['file_name'])
@@ -155,18 +159,28 @@ class HTML_Scraper:
         '''
         Searches through data_directory for newly downloaded job listings in HTML, then places the places them into database via JSON.
         '''
-        data_directory = self.working_dir if data_directory==None else data_directory
+        data_directory = self.working_dir+"input_eml_files\\" if data_directory==None else data_directory
         #get list of all html files in directory as all_files
         #find the left outer join between all_files and set(self.read_filenames.values())
         
         file_list = set(os.listdir(data_directory))
-        unread_files = list(file_list.difference(self.read_filenames)).sort()
+        difference = file_list-self.read_filenames
+        unread_files = list(difference)
+        unread_files.sort()
+        if debug|self.debug:
+            print(data_directory)
+            print("File List:",file_list)
+            print("Read Files",self.read_filenames)
+            print("Diff: !!!!!!!!!!!!!!!!!!!!!!!", (file_list-self.read_filenames))
+            print("Unread: ", unread_files)
+            # unread_files = [] if unread_files is None else unread_files
         
         for file in unread_files:
-            eml_file = open(self.working_dir+file, 'r', encoding='utf-8')
+            eml_file = open(data_directory+file, 'r', encoding='utf-8')
             file_contents = eml_file.read()
             eml_file.close()
             
+            #checks for LinkedIn template types.
             application_filter = re.compile("X-LinkedIn-Template: jobs_applicant_applied")
             viewed_filter = re.compile("X-LinkedIn-Template: email_jobs_job_application_viewed")
             rejected_filter = re.compile("X-LinkedIn-Template: email_jobs_application_rejected")
@@ -175,7 +189,7 @@ class HTML_Scraper:
             if re.search(application_filter,file_contents):
                 scanned_info = self.scan_new_application(file,file_contents,debug)
                 self.add_new_entries(scanned_info,"applied")
-                if debug:
+                if debug|self.debug:
                     print("SUCCESS: Added \"{}\" file to scanned:'{}' @ {}".format(file,scanned_info['position'], scanned_info['company']),"\n")
             elif re.search(viewed_filter,file_contents):
                 scanned_info = self.scan_application_viewed(file,file_contents,debug)
@@ -184,23 +198,27 @@ class HTML_Scraper:
                 scanned_info = self.scan_application_rejected(file,file_contents,debug)
                 self.add_new_entries(scanned_info,"rejected")
             else:
-                print("Error: No matches ({file})")
+                print(f"Error: No matches ({file})")
 
-    def export_to_file(self, export_dir=None):
+    def export_to_file(self, export_dir=None, debug=False):
         # print(self.applied_jobs)
         applied_jobs = self.applied_jobs
-        applied_keys = applied_jobs[0].keys()
+        applied_keys = applied_jobs[0].keys() if len(applied_jobs)>0 else []
         export_dir=self.working_dir+'output_files' if export_dir is None else export_dir
         with open(f'{export_dir}\\job_applications.csv','w',encoding='utf-8-sig',newline='') as output_file:
             dict_writer = csv.DictWriter(output_file, applied_keys)
             dict_writer.writeheader()
             dict_writer.writerows(applied_jobs)
+            if debug|self.debug:
+                print("Exported read_files.py")
         
         with open(f'{export_dir}\\read_files.py','w',encoding='utf-8-sig',newline='') as output_file:
             output_file.write("read_files={")
             for entry in self.read_filenames:
                 output_file.write("\""+entry+"\",")
             output_file.write("}")
+            if debug|self.debug:
+                print("Exported read_files.py")
 
     def import_from_file(self):
         #In progress
@@ -216,18 +234,18 @@ class HTML_Scraper:
             jobID = application['jobID']
             postURL = application['postURL']
             try:
-                urllib.request.urlretrieve(postURL, f"{download_directory}Job_{jobID}.html")
-                if debug:
+                urllib.request.urlretrieve(postURL, f"{download_dir}\\Job_{jobID}.html")
+                if debug|self.debug:
                     print(f"Success! (ID:{jobID}={postURL})")
             except:
-                with open(f"{download_directory}\\Job_{jobID}.html",'w',encoding='utf-8-sig',newline='') as output_file:
+                with open(f"{download_dir}\\Job_{jobID}.html",'w',encoding='utf-8-sig',newline='') as output_file:
                     output_file.write("Null")
-                    if debug:
+                    if debug|self.debug:
                         print(f"Error 404! (ID:{jobID}={postURL}) ")
 
-    def parse_jobs_html(self,output_filepath= None, input_directory=None,debug=False):
+    def parse_jobs_html(self,output_filepath=None, input_directory=None,debug=False):
         input_dir=self.working_dir+"\\scraped_data" if input_directory is None else input_directory
-        output_dir=self.working_dir+"\\output_files\\html_data.csv" if output_dir is None else output_dir
+        output_dir= (self.working_dir+"\\output_files" if output_filepath is None else output_filepath) +"\\html_data" 
         file_list = set(os.listdir(input_dir))
         unread_files = list(file_list.difference(self.scraped_htmls))
         unread_files.sort()
@@ -244,15 +262,16 @@ class HTML_Scraper:
                 'JobID':jobID,
                 'raw':file_contents,
             }
-            if debug:
+            if debug|self.debug:
                 print(datum)
             data.append(datum)
-        if debug:
+        if debug|self.debug:
             print(f"ALL HTML DATA: {data}")
         return data
 
     def update_db(self):
         pass
+                if debug|self.debug:
 
 class jobID:
     def __init__(self):
@@ -270,12 +289,16 @@ class jobID:
         return self.Value-1
 
 if __name__=='__main__':
-    h = HTML_Scraper('\\data\\')
-    h.update_from_local(debug=False)
-    h.export_to_file()
-    h.download_posting_html()
+    try:
+        debug = True if 'debug' in sys.argv else False
+    except:
+        debug = False
+    h = HTML_Scraper('data\\', debug=debug)
     
+    h.download_posting_html()
     # h.import_from_file()
+    
+    # # Debugging:
     # print(h.posted_jobs)
     # # Debugging:
     # print(h.scan_new_application('You applied for Supply Chain Data Analyst 100% Remote Fortune 60 Co Direct Hire Salary up to $110K per annum at Confidential.eml')) #(long subject name and outputs)
