@@ -107,8 +107,6 @@ class HTML_Scraper:
         prefix = "Your application to "
         m = re.compile(f"{prefix}.+\.eml",flags=re.DOTALL)
         if re.match(m, file_name):
-            if debug:
-                print(f"easy way worked!")
             Position, Company = Subject[len(prefix):].split(" at ")
             if debug|self.debug:
                 print("easy way worked! {} at {}".format(Position,Company))
@@ -228,7 +226,6 @@ class HTML_Scraper:
         pass
 
     def download_posting_html(self, download_directory=None, debug=False):
-        # stored = []
         download_dir=self.working_dir+'output_files\\scraped_data' if download_directory is None else download_directory
         for application in self.applied_jobs:
             jobID = application['jobID']
@@ -251,7 +248,7 @@ class HTML_Scraper:
         unread_files.sort()
         data = []
         for file in unread_files:
-            #Prolly wanna use an html parser at some point.
+            #TODO: Implement BS4 for parsing
             jobID = file.strip("\.html"|"Job_")
             eml_file = open(input_dir+file, 'r', encoding='utf-8')
             file_contents = eml_file.read()
@@ -315,21 +312,23 @@ if __name__=='__main__':
     try:
         debug = True if 'debug' in sys.argv else False
         clean = True if 'clean' in sys.argv else False
+        download = True if 'download' in sys.argv else False
     except:
         debug = False
         clean = False
+        download = False
     h = HTML_Scraper('data\\', debug=debug)
     if clean==True:
         h.clean_db()
     else:
         h.update_from_local()
         h.export_to_file()
-        h.download_posting_html()
+        if download:
+            h.download_posting_html()
     # h.import_from_file()
     
     # # Debugging:
     # print(h.posted_jobs)
-    # # Debugging:
     # print(h.scan_new_application('You applied for Supply Chain Data Analyst 100% Remote Fortune 60 Co Direct Hire Salary up to $110K per annum at Confidential.eml')) #(long subject name and outputs)
     # h.scan_new_application('You applied for FULLY REMOTE- Software Engineer (Python_Django) at CyberCoders.eml',debug=True) #(symbols)
     # h.scan_new_application('You applied for Data Analyst at Fēnom Digital.eml',debug=True) #(utf-8 encoding req)
