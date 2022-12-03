@@ -3,6 +3,13 @@ data/
 notes/
 archive/
 History.py
+credentials.
+__trash/
+__scratch/
+credentials/
+devenv
+jupyter/
+models/config/credentials/
 
 
 

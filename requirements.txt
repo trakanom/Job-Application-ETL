@@ -1,2 +1,15 @@
 python-dotenv
 pandas
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+beautifulsoup4
+requests
+lxml
+html5lib
+selenium
+webdriver-manager
+nltk
+scikit-learn
+seaborn
+sqlalchemy
