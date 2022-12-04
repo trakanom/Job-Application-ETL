@@ -3,13 +3,19 @@ data/
 notes/
 archive/
 History.py
-credentials.
+credentials/
 __trash/
 __scratch/
+__previous_versions/
 credentials/
-devenv
+dev/
+devenv/
 models/config/credentials/
-
+token.pickle
+parser.cookies.txt
+cookies.pkl
+bash.exe.stackdump
+*.json
 
 
 # Byte-compiled / optimized / DLL files
