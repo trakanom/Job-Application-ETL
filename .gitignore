@@ -16,6 +16,7 @@ parser.cookies.txt
 cookies.pkl
 bash.exe.stackdump
 *.json
+dev/
 
 
 # Byte-compiled / optimized / DLL files
