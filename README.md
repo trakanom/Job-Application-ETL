@@ -24,8 +24,6 @@ In-Development:
 - Export to SQL
 - PowerBI Dashboard 
 
-Requires google credential json
-
 Next Steps:
 - Retrieval of all LinkedIn Premium data available for companies and positions applied to.
 - Multi-platform support (Untapped, Ziprecruiter, etc)
