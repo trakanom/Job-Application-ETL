@@ -1,7 +1,14 @@
 # User data
 data/
 notes/
+archive/
 History.py
+credentials.
+__trash/
+__scratch/
+credentials/
+devenv
+models/config/credentials/
 
 
 
