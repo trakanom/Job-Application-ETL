@@ -247,7 +247,7 @@ if __name__=='__main__':
     # p = Parser(working_dir="data\\")
     # p.load_from_backup_csv("data\\output_files\\")
     # p.update_local_from_eml("data\\input\\")
-    # p.get_email(credPath="\\dev\\config\\credentials.json")
+    # p.get_email(credPath="\\config\\credentials.json")
     start = time.now()
     db = Local_Database()
     p = Parser(working_dir="data\\")
@@ -256,4 +256,4 @@ if __name__=='__main__':
     end = time.now()
     time_to_finish = end-start
     print(time_to_finish)
-    # # p.get_email(credPath="\\dev\\config\\credentials.json")
+    # # p.get_email(credPath="\\config\\credentials.json")

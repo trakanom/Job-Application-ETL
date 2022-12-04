@@ -35,7 +35,7 @@ def getEmails(credpath, filters = None, maxRequests = None, query=None, nextPage
     # Variable creds will store the user access token.
     # If no valid token found, we will create one.
     creds = None
-    pickle_path = '.\\dev\\models\\config\\token.pickle'
+    pickle_path = '.\\models\\config\\token.pickle'
     pickle_path = re.search(r"(\.(\\\w+)+)\\\w+.json", credpath).group(1)+r"\\token.pickle"
     # The file token.pickle contains the user access token.
     # Check if it exists
@@ -135,7 +135,7 @@ def getEmails(credpath, filters = None, maxRequests = None, query=None, nextPage
     return cached_data
 if __name__=='__main__':
     print(os.getcwd())
-    # credential_path = ".\\dev\\models\\config\\mikanometrics_gmail_credentials.json"
+    # credential_path = ".\\models\\config\\mikanometrics_gmail_credentials.json"
     credential_path = ".\\models\\config\\mika_wisener_gmail_credentials.json"
     query=r'from:jobs-noreply@linkedin.com|jobs-listings@linkedin.com -"apply now|to" -"new job|jobs" -"don\'t forget"'
     getEmails(credpath=credential_path, query=query, maxResults=500)

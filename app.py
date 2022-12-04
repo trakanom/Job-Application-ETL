@@ -4,7 +4,7 @@ import time
 
 if __name__=='__main__':
     start = time.time() #TODO run timeit
-    # DB = Local_Database(".\\dev\\data\\")
+    # DB = Local_Database(".\\data\\")
     DB = Local_Database() #TODO develop Local_Database SQL CRUD etc
     p = Parser(working_dir=".\\data\\") #TODO Instantiate/Verify file structure inside working_dir
     # DB.restore(".\\data\\output_files\\db\\")
