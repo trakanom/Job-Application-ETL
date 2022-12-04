@@ -19,7 +19,7 @@ class Parser:
         self.read_email_subjects = set()
         configuration = dotenv_values(".env")
         self.parser = LinkedInParser(configuration['USERNAME'], configuration['PASSWORD'])
-    def load_from_backup(self, directory=None, limit=None):
+    def load_from_backup_csv(self, directory=None, limit=None):
         '''
         Syncs from (local) db.
         params:
@@ -44,7 +44,7 @@ class Parser:
             imported_df = pd.read_csv(path)
             self.db.update({label:imported_df})
             print(f"Imported {label} from {path}.\nContents:", self.db[label].head(), sep="\n", end="\n-------------------------------------------------------------------------------------------------------")
-    def update_local(self, input_dir = None, limit=None):
+    def update_local_from_eml(self, input_dir = None, limit=None):
         '''
         Control function. 
         Scans an input directory and loads parsed data to the database.
@@ -67,7 +67,7 @@ class Parser:
             print("application data", application_data)
             # cleaned_data = self.clean_data(application_data) #cleans the data and separates data into the correct buckets
             # print("cleaned data", cleaned_data)
-            if True or application_data['valid']!=True or application_data['valid']==True: #TODO Get rid of this tautology.
+            if True or application_data['valid']==True: #TODO Get rid of this tautology.
                 if application_data['update_type'] in cached_data.keys():
                     cached_data[application_data['update_type']].append(application_data)
                     if company_data!= None:
@@ -245,14 +245,14 @@ class Parser:
         
 if __name__=='__main__':
     # p = Parser(working_dir="data\\")
-    # p.load_from_backup("data\\output_files\\")
-    # p.update_local("data\\input\\")
+    # p.load_from_backup_csv("data\\output_files\\")
+    # p.update_local_from_eml("data\\input\\")
     # p.get_email(credPath="\\dev\\config\\credentials.json")
     start = time.now()
     db = Local_Database()
     p = Parser(working_dir="data\\")
-    p.load_from_backup("data\\output_files\\")
-    p.update_local("data\\input_files\\")
+    p.load_from_backup_csv("data\\output_files\\")
+    p.update_local_from_eml("data\\input_files\\")
     end = time.now()
     time_to_finish = end-start
     print(time_to_finish)
