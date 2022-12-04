@@ -8,6 +8,9 @@ Reads user email via Gmail Oauth and API services,
 Web scrapes job application posts and associated companies' pages from LinkedIn
 Loads cleaned data into SQL database for data analysis and ML applications.
 
+Requires a Google Chrome installation (for now).
+
+
 Included:
 - Gmail OAuth & API integration
 - Selenium and BeautifulSoup powered web scraping of LinkedIn
@@ -34,7 +37,6 @@ Stretch Goals:
 - Gmail add-on for easier manual dataset aggregation 
 - Causal ML, A/B Testing to correlate resume features with outreach metrics
 - Personalized ATS-optimized resume generation
-
 
 
 
