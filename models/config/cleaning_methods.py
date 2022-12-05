@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-from .CONSTS import CONSTS
+from .CONSTS import DATE_FORMAT
 import email
 
 
@@ -108,7 +108,7 @@ def fix_unicode(df):
 
 def fix_dtypes(df):
     modified_df = df.convert_dtypes()
-    modified_df['date']=pd.to_datetime(modified_df['date'],format=CONSTS['date_format']) #TODO Fix this
+    modified_df['date']=pd.to_datetime(modified_df['date'],format=DATE_FORMAT) #TODO Fix this
     modified_df['update_type']=modified_df['update_type'].astype('category')
     
     # data_types = {
