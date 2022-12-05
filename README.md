@@ -34,14 +34,6 @@ Next Steps:
 - Performance improvements
 
 Stretch Goals:
-- Gmail add-on for easier manual dataset aggregation 
+- Browser extension for easier manual data entry
 - Causal ML, A/B Testing to correlate resume features with outreach metrics
 - Personalized ATS-optimized resume generation
-
-
-
-
-
-
-
-
