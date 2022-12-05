@@ -1,3 +1,1 @@
-CONSTS = {
-    "date_format":'%Y-%m-%d %H:%M:%S %Z'
-}
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S %Z'
