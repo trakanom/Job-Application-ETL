@@ -102,7 +102,10 @@ class App:
         root.mainloop()
         
     def To_Parsing():
-        
+        '''
+        Button function to begin parsing after eml vs Gmail and LinkedIn/etc integration are selected for.
+        '''
+        pass
 if __name__=="__main__":
     # print(choose_directory())
     app = App()
