@@ -250,5 +250,9 @@ def get_filter_set(filter_path, filter_library=None):
     # parsing_methods = self.default_filter_dict
     parsing_methods = filter_library
     for slicer in filter_path.split("."):
-        parsing_methods = parsing_methods[slicer]
+        try:
+            parsing_methods = parsing_methods[slicer]
+        except Exception as e:
+            
+            break
     return parsing_methods
