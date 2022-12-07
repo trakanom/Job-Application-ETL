@@ -9,6 +9,7 @@ Features:
 
 
 GUI:
+- Create a discrete flow
 - Hookup to gmail
 - Log in to linkedin (or not)
 
