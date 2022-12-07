@@ -23,7 +23,9 @@ Data Structures:
     - Application_history (JobID, UserID, Job Title, CompanyID, Location, Work_Type, Salary, Benefits, Industry, Status, **update_dates)
     - Company_Info (CompanyID, Company_Name, website, Industry, HQ Location, Locations, email_domain, )
 - Data Hosting?
-
+- efficiency: list of files + list of changelog drop duplicates keepp none. 
+file for file in filter(file_list,lambda x: x[['subject','received']] not in changelog[['email_name','date_sent']]) pseudocode. Pandas set-like logic? 
+~(A intercect B) = A - A intercect B
 
 
 Parsing:
