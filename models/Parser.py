@@ -33,7 +33,7 @@ class Parser:
         except FileNotFoundError:
             return "File not Found"
         file_filter = lambda x: True if "_df.csv" in x else False
-        filtered_list = filter(file_filter, file_list)
+        filtered_list = list(filter(file_filter, file_list))
         self.db = {}
         if limit is not None and isinstance(limit,int): #makes testing easier.
             filtered_list=filtered_list[:limit]
@@ -139,7 +139,6 @@ class Parser:
         # company_df = pd.DataFrame(cached_data).set_index("Company_Name")
         # post_df['error_count']=post_df['errors'].apply(len)
         # print(post_df.head())
-        time.sleep(1)
         # post_df.to_csv("post_csv.csv", mode="w", encoding="utf-8", index_label="PostID")
         # company_df.to_csv("company_csv.csv", mode="w", encoding="utf-8", index_label="Company_Name")
         # return post_df,company_df
