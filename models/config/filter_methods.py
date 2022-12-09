@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from .cleaning_methods import decode_mime_stuff, str_strip
 from .CONSTS import DATE_FORMAT
 import datetime as dt
-
+import time
 
 
 '''
@@ -96,7 +96,7 @@ testing_platform_filters = {
                 'date'        : lambda x : dt.datetime.strptime(re.search(re.compile('Date: \D{3}, (.+ \+0000 \(UTC\))', flags = re.DOTALL),x).group(1),'%d %b %Y %H:%M:%S %z (%Z)').strftime(DATE_FORMAT), #standard to gmail format; gets datetime of email sent
                 'update_type' : lambda x : re.search(r"X-LinkedIn-Template: (\D+_?)_", x).group(1).split("_")[-1], #type of email update
                 # 'title' : lambda x : re.search(x,r''), #title of job posting
-                # 'company' : lambda x : re.search(x,r''), #company name
+                # 'company' : lambda x : re.search(x,r''), #company name 
             },
             'applicant' : {
                 'PostID'   : lambda x : re.search( r'View job: https:(\S+&jobId=3D(\w+))' , x, flags = re.DOTALL ).group(2), #grabs linked-in PostID for 
@@ -164,7 +164,7 @@ testing_platform_filters = {
         },
         'selenium-client': {
             "post" : { #Change all of these for selenium
-                "Date_Scanned"      : dt.datetime.now(),
+                "Date_Scanned"      : lambda : time.time(),
                 "Company_Name"      : lambda x: x.find("span", class_="jobs-unified-top-card__company-name").a.text,
                 "Company_URL"       : lambda x: "https://www.linkedin.com" + x.find("span", class_="jobs-unified-top-card__company-name").a['href'].replace("life/", ""), #/html/body/div[6]/div[3]/div/div[1]/div[1]/div/div[1]/div/div/div[1]/div[1]/span[1]/span[1]/a ////// '//*[@id="ember25"]'
                 "Number_Applicants" : lambda x: int(x.find("span", class_=re.compile(r"^jobs-unified-top-card__applicant-count")).text.replace(" applicants","").strip()),
