@@ -111,7 +111,7 @@ class LinkedInParser(object):
                 html_data.update({data_label : listing_filters[data_label](soup)}) #applies filter to captured data and inserts the key-value pair into html_data
             except Exception as e:
                 html_data.update({data_label : None}) #If error, fills in value with null
-                html_data["errors"].update({data_label:e}) #
+                html_data["errors"].update({data_label:e}) #logging the error
         html_data = self.dict_clean(html_data)
 
         return html_data
