@@ -3,7 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from .cleaning_methods import decode_mime_stuff, str_strip
 from .CONSTS import DATE_FORMAT
-import datetime as dt
+from datetime import datetime as dt
 import time
 
 
@@ -19,7 +19,7 @@ platform_filters = {
     'LinkedIn': {
         'match' : lambda x : re.search(x,re.compile(r"X-LinkedIn-Template: (\D+_?)_")), 
         'scan' : {
-            'date'        : lambda x : dt.datetime.strptime(re.search(re.compile('Date: \D{3}, (.+ \+0000 \(UTC\))', flags = re.DOTALL),x).group(1),'%d %b %Y %H:%M:%S %z (%Z)').strftime(DATE_FORMAT), #standard to gmail format; gets datetime of email sent
+            'date'        : lambda x : dt.strptime(re.search(re.compile('Date: \D{3}, (.+ \+0000 \(UTC\))', flags = re.DOTALL),x).group(1),'%d %b %Y %H:%M:%S %z (%Z)').strftime(DATE_FORMAT), #standard to gmail format; gets datetime of email sent
             'update_type' : lambda x : re.search(r"X-LinkedIn-Template: (\D+_?)_", x).group(1).split("_")[-1], #type of email update
             # 'title' : lambda x : re.search(x,r''), #title of job posting
             # 'company' : lambda x : re.search(x,r''), #company name
@@ -93,7 +93,7 @@ testing_platform_filters = {
         'eml': {
             'match' : lambda x : re.search(x,re.compile(r"X-LinkedIn-Template: (\D+_?)_")), 
             'scan' : {
-                'date'        : lambda x : dt.datetime.strptime(re.search(re.compile('Date: \D{3}, (.+ \+0000 \(UTC\))', flags = re.DOTALL),x).group(1),'%d %b %Y %H:%M:%S %z (%Z)').strftime(DATE_FORMAT), #standard to gmail format; gets datetime of email sent
+                'date'        : lambda x : dt.strptime(re.search(re.compile('Date: \D{3}, (.+ \+0000 \(UTC\))', flags = re.DOTALL),x).group(1),'%d %b %Y %H:%M:%S %z (%Z)').strftime(DATE_FORMAT), #standard to gmail format; gets datetime of email sent
                 'update_type' : lambda x : re.search(r"X-LinkedIn-Template: (\D+_?)_", x).group(1).split("_")[-1], #type of email update
                 # 'title' : lambda x : re.search(x,r''), #title of job posting
                 # 'company' : lambda x : re.search(x,r''), #company name 
@@ -113,7 +113,7 @@ testing_platform_filters = {
                 
             },
             'rejected' : {
-                'original_date_applied' : lambda x: dt.datetime.strptime(re.search(re.compile(r"Applied on (\w{3,9} \d{1,3}, \d{4})"),x).group(1),'%B %d, %Y').strftime(DATE_FORMAT),
+                'original_date_applied' : lambda x: dt.strptime(re.search(re.compile(r"Applied on (\w{3,9} \d{1,3}, \d{4})"),x).group(1),'%B %d, %Y').strftime(DATE_FORMAT),
                 'title'    : lambda x : decode_mime_stuff(re.search(re.compile(r"Subject: ((\=\?UTF-8\?Q\?)?Your[\s_]application[\s_]to[\s_](.+))MIME", flags=re.DOTALL), x).group(1)),
                 'position' : lambda x : decode_mime_stuff(re.search(re.compile(r"Subject: ((\=\?UTF-8\?Q\?)?Your[\s_]application[\s_]to[\s_](.+))MIME", flags=re.DOTALL), x).group(1)).split(" at ")[0],
                 'company'  : lambda x : decode_mime_stuff(re.search(re.compile(r"Subject: ((\=\?UTF-8\?Q\?)?Your[\s_]application[\s_]to[\s_](.+))MIME", flags=re.DOTALL), x).group(1)).split(" at ")[1],
@@ -122,15 +122,15 @@ testing_platform_filters = {
         'email': {
             'match' : lambda x : "X-LinkedIn-Template" in x['headers'].keys(),
             'scan' : {
-                'date'        : lambda x : lambda x : dt.datetime.strptime(re.sub(r"\s\(\w{3}\)","", x['headers']['Received'].split(';')[1].split(",")[1].strip()), '%d %b %Y %H:%M:%S %z').strftime(DATE_FORMAT), #standard to gmail format; gets datetime of email sent
+                'date'        : lambda x : dt.strptime(re.sub(r"\s\(\w{3}\)","", x['headers']['Received'].split(';')[1].split(",")[1].strip()), '%d %b %Y %H:%M:%S %z').strftime(DATE_FORMAT), #standard to gmail format; gets datetime of email sent
                 'update_type' : lambda x : re.search(r'jobs?_appli\w{4,6}_([a-z]+)', x['headers']['X-LinkedIn-Template']).group(1), #type of email update
                 'subject'     : lambda x : decode_mime_stuff(x['headers']['Subject']).replace(",","").replace(".","").replace("&", "and").split(":")[0],
                 # 'title' : lambda x : re.search(x,r''), #title of job posting
                 # 'company' : lambda x : re.search(x,r''), #company name
             },
-            'applicant' : {
-                'PostID'   : lambda x : re.search(r"(\d{10})",x['body'].find("a", href=re.compile(r"https://www.linkedin.com/comm/jobs/view/"))['href']).group(1),
-                'url'      : lambda x : 'https://www.linkedin.com/jobs/view/{}/'.format(re.search(r"(\d{10})",x['body'].find("a", href=re.compile(r"https://www.linkedin.com/comm/jobs/view/"))['href']).group(1)),
+            'applied' : {
+                'PostID'   : lambda x : re.search(r"(\d{10})", x['body']).group(1), #.find("a", href=re.compile(r"https://www.linkedin.com/comm/jobs/view/"))['href']).group(1),
+                'url'      : lambda x : 'https://www.linkedin.com/jobs/view/{}/'.format(re.search(r"(\d{10})", x['body'].find("a", href=re.compile(r"https://www.linkedin.com/comm/jobs/view/"))['href']).group(1)),
                 'position' : lambda x : x['subject'].split(" at ")[0],
                 'company'  : lambda x : x['subject'].split(" at ")[1],
             },
@@ -140,7 +140,7 @@ testing_platform_filters = {
                 'company'  : lambda x : x['subject'].split(" was viewed by ")[0],
             },
             'rejected' : {
-                'original_date_applied' : lambda x: dt.datetime.strptime(re.search(re.compile(r"Applied on (\w{3,9} \d{1,3}, \d{4})"),x['body']).group(1),'%B %d, %Y').strftime(DATE_FORMAT),
+                'original_date_applied' : lambda x: dt.strptime(re.search(re.compile(r"Applied on (\w{3,9} \d{1,3}, \d{4})"),x['body']).group(1),'%B %d, %Y').strftime(DATE_FORMAT),
                 'position' : lambda x : x['subject'].split(" at ")[0],
                 'company'  : lambda x : x['subject'].split(" at ")[1],
             },
