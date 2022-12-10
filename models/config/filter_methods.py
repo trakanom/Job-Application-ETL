@@ -131,17 +131,17 @@ testing_platform_filters = {
             'applied' : {
                 'PostID'   : lambda x : re.search(r"(\d{10})", x['body']).group(1), #.find("a", href=re.compile(r"https://www.linkedin.com/comm/jobs/view/"))['href']).group(1),
                 'url'      : lambda x : 'https://www.linkedin.com/jobs/view/{}/'.format(re.search(r"(\d{10})", x['body'].find("a", href=re.compile(r"https://www.linkedin.com/comm/jobs/view/"))['href']).group(1)),
-                'position' : lambda x : x['subject'].split(" at ")[0],
+                'position' : lambda x : x['subject'].split(" at ")[0].split(" for ")[1],
                 'company'  : lambda x : x['subject'].split(" at ")[1],
             },
             'viewed' : {
                 'PostID'   : lambda x : re.search(re.compile(r'jobPostingId%3D(\d{10})%26pivotType%3Dsim', flags = re.DOTALL), x['body']).group(1),
-                'position' : lambda x : x['subject'].split(" was viewed by ")[0],
-                'company'  : lambda x : x['subject'].split(" was viewed by ")[0],
+                'position' : lambda x : x['subject'].split(" was viewed by ")[0].split(" for ")[1],
+                'company'  : lambda x : x['subject'].split(" was viewed by ")[1],
             },
             'rejected' : {
                 'original_date_applied' : lambda x: dt.strptime(re.search(re.compile(r"Applied on (\w{3,9} \d{1,3}, \d{4})"),x['body']).group(1),'%B %d, %Y').strftime(DATE_FORMAT),
-                'position' : lambda x : x['subject'].split(" at ")[0],
+                'position' : lambda x : x['subject'].split(" at ")[0].split(" to ")[1],
                 'company'  : lambda x : x['subject'].split(" at ")[1],
             },
 
