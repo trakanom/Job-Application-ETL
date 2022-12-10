@@ -4,8 +4,9 @@ from .CONSTS import DATE_FORMAT
 import email
 
 
-def decode_mime_stuff(s):
-    print(s)
+def decode_mime_stuff(s, verbose=None):
+    if verbose:
+        print(s)
     s=s.replace("\n","").strip()
     if "=?" in s:
         # print(s)
@@ -15,16 +16,19 @@ def decode_mime_stuff(s):
     else:
         results = s
     # results = " ".join(results.split(" ")[3:])
-    print("DECODE RESULTS: ",results)
+    if verbose:
+        print("DECODE RESULTS: ",results)
     return results
 
-def str_strip(s):
-    print("1'",s,"'",sep="")
+def str_strip(s, verbose=None):
+    if verbose:
+        print("1'",s,"'",sep="")
     s = re.sub(r'\n','', s)
     s = re.sub(r'\s+', ' ', s)
     # s = re.sub(r'\s+%\s+?', " ", s)
     s = s.strip().strip()
-    print("2'",s,"'",sep="")
+    if verbose:
+        print("2'",s,"'",sep="")
     # new_string = " ".join([word.strip() for word in s.split(" ")])
     return s
 
